@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Upload Images</title>
+  </head>
+  <body>
+    <h1>Upload Images</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+      <div>
+        <input type="file" name="image1">
+        <input type="text" name="description1" maxlength="140" placeholder="Description (140 characters)">
+      </div>
+      <div>
+        <input type="file" name="image2">
+        <input type="text" name="description2" maxlength="140" placeholder="Description (140 characters)">
+      </div>
+      <div>
+        <input type="file" name="image3">
+        <input type="text" name="description3" maxlength="140" placeholder="Description (140 characters)">
+      </div>
+      <div>
+        <input type="file" name="image4">
+        <input type="text" name="description4" maxlength="140" placeholder="Description (140 characters)">
+      </div>
+      <button type="submit">Upload</button>
+    </form>
+  </body>
+
+  <script>
+    const express = require('express');
+    const multer = require('multer');
+    const app = express();
+    const port = 3000;
+
+    const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/');
+    },
+    filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+    }
+    });
+
+    const upload = multer({ storage: storage });
+
+    app.use(express.static('public'));
+
+    app.post('/upload', upload.fields([
+    { name: 'image1', maxCount: 1 },
+    { name: 'image2', maxCount: 1 },
+    { name: 'image3', maxCount: 1 },
+    { name: 'image4', maxCount: 1 }
+    ]), (req, res) => {
+    const descriptions = [
+        req.body.description1,
+        req.body.description2,
+        req.body.description3,
+        req.body.description4
+    ];
+    const files = [
+        req.files['image1'][0],
+        req.files['image2'][0],
+        req.files['image3'][0],
+        req.files['image4'][0]
+    ];
+    console.log(descriptions);
+    console.log(files);
+    res.send('Images uploaded successfully!');
+    });
+
+    app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+    });
+
+  </script>
+</html>
+
